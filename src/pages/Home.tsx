@@ -4,7 +4,6 @@ import Loader from '../components/Loader';
 import Island from '../models/Island';
 import Sky from '../models/Sky';
 import Bird from '../models/Bird';
-import { OrbitControls } from '@react-three/drei';
 {/* <div className='absolute top-28 left-0 z-10 flex items-center justify-center'>
             popup
         </div> */}
@@ -43,7 +42,6 @@ const Home = () => {
             position={cloudPosition}
             scale={cloudScale}
             rotation={cloudRotation} />
-            <OrbitControls/>
         </Suspense>
       </Canvas>
     </section>

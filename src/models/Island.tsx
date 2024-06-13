@@ -12,7 +12,6 @@ import { useFrame,useThree } from '@react-three/fiber'
 import  shipInTheClouds from '../assets/3d/shipInClouds.glb' 
 import {a} from '@react-spring/three'
 import { is } from '@react-three/fiber/dist/declarations/src/core/utils'
-
 interface IslandProps {
   isRotating: boolean;
   setIsRotating: (value: boolean) => void;
@@ -21,12 +20,12 @@ interface IslandProps {
 
 const Island = (props: IslandProps) => {
   const { setCurrentStage,setIsRotating,isRotating } = props;
-  const { camera } = useThree();
+  const { camera,gl,viewport } = useThree();
   const islandRef = useRef();
-  const { nodes, materials } = useGLTF(shipInTheClouds) as { nodes: { [name: string]: THREE.Object3D }, materials: { [name: string]: THREE.Material } };
-  const {gl,viewport} = useThree();
   const lastX = useRef(0);
   const rotationSpeed = useRef(0);
+   const { nodes, materials } = useGLTF(shipInTheClouds) as { nodes: { [name: string]: THREE.Object3D }, materials: { [name: string]: THREE.Material } };
+ 
   const dampingFactor = 0.95;
   const handlePointerDown = (e) => {
   e.stopPropagation();
@@ -52,27 +51,16 @@ const Island = (props: IslandProps) => {
    
     }
   }
-
-  const handleKeyDown = (e: KeyboardEvent) => {  
-    if(e.key === 'ArrowLeft'){
-      if(!isRotating) setIsRotating(true);
-      islandRef.current.rotation.y += -0.1 * Math.PI;
-    }
-    else if(e.key === 'ArrowRight'){
-      if(!isRotating) setIsRotating(true);
-      islandRef.current.rotation.y -= 0.1 * Math.PI;
-    }
+  const handleWheel = (e: WheelEvent) => {
+    e.preventDefault();
+    const zoomSpeed = 0.01; 
+    camera.position.z += e.deltaY * zoomSpeed;
   }
-const handleKeyUp = (e: KeyboardEvent) => {
-  if(e.key === 'ArrowLeft' || e.key === 'ArrowRight'){
-    setIsRotating(false);
-  }
-}
 useFrame(() => {
   if (islandRef.current) {
     camera.position.x = islandRef.current.position.x;
     camera.position.y = islandRef.current.position.y;
-    camera.position.z = islandRef.current.position.z;
+    // camera.position.z = islandRef.current.position.z;
   }
 });
 // useFrame(() => {
@@ -125,20 +113,17 @@ useFrame(() => {
   useEffect(() => {
     const canvas = gl.domElement;
     canvas.addEventListener('pointerdown',handlePointerDown);
-    canvas.addEventListener('pointerup',handlePointerUp);
-    canvas.addEventListener('pointermove',handlePointerMove);
-    document.addEventListener('keydown',handleKeyDown);
-    document.addEventListener('keyup',handleKeyUp);
+    canvas.addEventListener('wheel', handleWheel);
     return () => {
       canvas.removeEventListener('pointerdown',handlePointerDown);
-      canvas.removeEventListener('pointerup',handlePointerUp);
-      canvas.removeEventListener('pointermove',handlePointerMove);
-      document.removeEventListener('keydown',handleKeyDown);
-      document.removeEventListener('keyup',handleKeyUp);
+      canvas.removeEventListener('wheel', handleWheel);
 
     }
   }, [gl,handlePointerDown,handlePointerUp,handlePointerMove]);
   return (
+
+
+
     <a.group {...props} ref={islandRef}>
       <group rotation={[-Math.PI / 2, 0, 0]} scale={0.003}>
         <group rotation={[Math.PI / 2, 0, 0]}>
@@ -150,6 +135,7 @@ useFrame(() => {
             position={[51.637, 0, -817.579]}
             rotation={[0, -Math.PI / 2, 0]}
           /> */}
+            
           <mesh
             castShadow
             receiveShadow
