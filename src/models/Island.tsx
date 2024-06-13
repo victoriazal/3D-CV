@@ -114,10 +114,13 @@ useFrame(() => {
     const canvas = gl.domElement;
     canvas.addEventListener('pointerdown',handlePointerDown);
     canvas.addEventListener('wheel', handleWheel);
+    canvas.addEventListener('pointerup', handlePointerUp);
+    canvas.addEventListener('pointermove', handlePointerMove);
     return () => {
       canvas.removeEventListener('pointerdown',handlePointerDown);
       canvas.removeEventListener('wheel', handleWheel);
-
+      canvas.removeEventListener('pointerup', handlePointerUp);
+      canvas.removeEventListener('pointermove', handlePointerMove);
     }
   }, [gl,handlePointerDown,handlePointerUp,handlePointerMove]);
   return (
